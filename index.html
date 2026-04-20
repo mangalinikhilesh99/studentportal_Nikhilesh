@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Portal Pro</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+body{
+    margin:0;
+    font-family:'Poppins',sans-serif;
+    overflow:hidden;
+    cursor:none;
+    color:white;
+}
+
+/* 🌍 Background */
+.bg{
+    position:fixed;
+    width:100%;
+    height:100%;
+    background:url("https://images.unsplash.com/photo-1446776811953-b23d57bd21aa") center/cover no-repeat;
+    filter:brightness(0.22);
+    z-index:-2;
+}
+
+.overlay{
+    position:fixed;
+    width:100%;
+    height:100%;
+    background:radial-gradient(circle,rgba(0,0,0,0.6),rgba(0,30,60,0.9));
+    z-index:-1;
+}
+
+/* 🎯 Floating emojis */
+.sticker{
+    position:absolute;
+    font-size:30px;
+    animation:float 5s infinite ease-in-out;
+}
+@keyframes float{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(-15px);}
+}
+
+/* 🧊 Main Card */
+.container{
+    width:420px;
+    margin:60px auto;
+    padding:25px;
+    border-radius:18px;
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(12px);
+    box-shadow:0 10px 40px rgba(0,0,0,0.5);
+}
+
+/* Steps */
+.step{display:none; animation:fade .4s ease;}
+.step.active{display:block;}
+
+@keyframes fade{
+    from{opacity:0;transform:translateY(10px);}
+    to{opacity:1;transform:translateY(0);}
+}
+
+/* Inputs */
+input,select{
+    width:100%;
+    padding:12px;
+    margin:8px 0;
+    border:none;
+    border-radius:10px;
+    outline:none;
+    font-size:14px;
+}
+
+/* Buttons */
+.buttons{
+    display:flex;
+    justify-content:space-between;
+    margin-top:10px;
+}
+
+button{
+    padding:10px 18px;
+    border:none;
+    border-radius:10px;
+    background:linear-gradient(45deg,#00c6ff,#0072ff);
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+button:hover{
+    transform:scale(1.05);
+}
+
+/* Progress */
+.progress{
+    height:8px;
+    background:#222;
+    border-radius:10px;
+    margin-bottom:15px;
+}
+
+.progress-bar{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,#00c6ff,#00ffcc);
+    border-radius:10px;
+}
+
+/* ❌ Popup */
+.popup{
+    position:fixed;
+    top:20px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#ff3b3b;
+    padding:10px 20px;
+    border-radius:12px;
+    display:none;
+    font-size:14px;
+}
+
+/* 🔔 Toast */
+.toast{
+    position:fixed;
+    top:20px;
+    right:20px;
+    background:#111;
+    padding:10px 15px;
+    border-radius:10px;
+    font-size:13px;
+    display:none;
+}
+
+/* 🖱️ PRO RGB Cursor */
+.cursor{
+    width:10px;height:10px;
+    border-radius:50%;
+    position:fixed;
+    pointer-events:none;
+    background:white;
+    box-shadow:
+    0 0 10px red,
+    0 0 20px blue,
+    0 0 30px lime;
+    animation:rgb 1s infinite linear;
+}
+
+.cursor-ring{
+    width:34px;height:34px;
+    border-radius:50%;
+    border:2px solid cyan;
+    position:fixed;
+    pointer-events:none;
+}
+
+@keyframes rgb{
+    0%{filter:hue-rotate(0deg);}
+    100%{filter:hue-rotate(360deg);}
+}
+</style>
+</head>
+
+<body onload="toast()">
+
+<div class="bg"></div>
+<div class="overlay"></div>
+
+<!-- stickers -->
+<div class="sticker" style="top:10%;left:8%">🌍</div>
+<div class="sticker" style="top:75%;left:5%">🎓</div>
+<div class="sticker" style="bottom:10%;right:10%">📚</div>
+
+<div class="cursor"></div>
+<div class="cursor-ring"></div>
+
+<div class="popup" id="popup"></div>
+<div class="toast" id="toast">👋 Welcome Back!</div>
+
+<div class="container">
+
+<div class="progress"><div class="progress-bar" id="bar"></div></div>
+
+<!-- STEP 1 -->
+<div class="step active">
+<h3>👤 Personal Info</h3>
+<input id="name" placeholder="Name">
+<input id="age" type="number" placeholder="Age">
+<input id="email" placeholder="Gmail">
+</div>
+
+<!-- STEP 2 -->
+<div class="step">
+<h3>🎓 Academic Info</h3>
+<input id="college" placeholder="College">
+<select id="course">
+<option value="">Course</option>
+<option>CS</option>
+<option>Engineering</option>
+</select>
+</div>
+
+<!-- STEP 3 -->
+<div class="step">
+<h3>🔒 Password</h3>
+<input type="password" id="pass">
+<input type="password" id="cpass">
+</div>
+
+<!-- STEP 4 -->
+<div class="step">
+<h3>🧠 Quiz</h3>
+<p>12 ÷ 3 = ?</p>
+<input id="quiz">
+</div>
+
+<!-- STEP 5 -->
+<div class="step">
+<h3>🎉 Final</h3>
+<div id="out"></div>
+</div>
+
+<div class="buttons">
+<button onclick="prev()">Back</button>
+<button onclick="next()">Next</button>
+</div>
+
+</div>
+
+<script>
+let i=0;
+let steps=document.querySelectorAll(".step");
+
+function show(){
+ steps.forEach((s,idx)=>s.classList.toggle("active",idx===i));
+ document.getElementById("bar").style.width=(i/(steps.length-1))*100+"%";
+}
+
+function pop(t){
+ let p=document.getElementById("popup");
+ p.innerText=t;
+ p.style.display="block";
+ setTimeout(()=>p.style.display="none",2000);
+}
+
+function toast(){
+ let t=document.getElementById("toast");
+ t.style.display="block";
+ setTimeout(()=>t.style.display="none",2500);
+}
+
+function validEmail(e){
+ return /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(e);
+}
+
+function next(){
+
+ let inputs=steps[i].querySelectorAll("input,select");
+ for(let x of inputs){
+    if(x.value===""){
+        pop("❌ Fill all fields!");
+        return;
+    }
+ }
+
+ if(i===0 && !validEmail(email.value)){
+    pop("❌ Invalid Gmail!");
+    return;
+ }
+
+ if(i===2 && pass.value!==cpass.value){
+    pop("🫥 Password mismatch!");
+    return;
+ }
+
+ if(i<steps.length-1){
+    i++;
+    if(i===steps.length-1){
+        document.getElementById("out").innerHTML=`
+        👤 ${name.value}<br>
+        🎂 ${age.value}<br>
+        📧 ${email.value}<br>
+        🏫 ${college.value}<br>
+        📘 ${course.value}<br>
+        🧠 ${quiz.value}
+        `;
+    }
+    show();
+ }
+}
+
+function prev(){
+ if(i>0){i--;show();}
+}
+
+/* cursor */
+let mx=0,my=0,rx=0,ry=0;
+const c=document.querySelector(".cursor");
+const r=document.querySelector(".cursor-ring");
+
+document.addEventListener("mousemove",e=>{
+ mx=e.clientX;
+ my=e.clientY;
+ c.style.left=mx+"px";
+ c.style.top=my+"px";
+});
+
+function anim(){
+ rx+=(mx-rx)*0.12;
+ ry+=(my-ry)*0.12;
+ r.style.left=(rx-17)+"px";
+ r.style.top=(ry-17)+"px";
+ requestAnimationFrame(anim);
+}
+anim();
+
+show();
+</script>
+
+</body>
+</html>
